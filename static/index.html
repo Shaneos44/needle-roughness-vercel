@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Needle Roughness Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; text-align: center; }
+    input[type=file] { margin-top: 20px; }
+    img { max-width: 300px; margin-top: 20px; border: 1px solid #ccc; }
+    .result { font-size: 20px; margin-top: 20px; color: #333; }
+  </style>
+</head>
+<body>
+  <h1>Needle Roughness Prediction</h1>
+
+  <input type="file" id="fileInput" accept="image/*" />
+  <br />
+  <img id="preview" src="#" alt="Preview" style="display:none;" />
+  <div class="result" id="result"></div>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
+    const result = document.getElementById("result");
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      // Preview the image
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+
+      // Send to backend
+      const formData = new FormData();
+      formData.append("file", file);
+
+      result.textContent = "Predicting...";
+
+      try {
+        const response = await fetch("/predict", {
+          method: "POST",
+          body: formData
+        });
+        const data = await response.json();
+        result.textContent = `Predicted Roughness Score: ${data.roughness_score}`;
+      } catch (error) {
+        result.textContent = "Error predicting roughness.";
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
