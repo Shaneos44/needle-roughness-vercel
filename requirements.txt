@@ -1,0 +1,6 @@
+fastapi
+scikit-image
+opencv-python-headless
+pillow
+joblib
+numpy
